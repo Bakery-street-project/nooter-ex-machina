@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AXIOM-7 // Sovereign Bionic Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #020408;
+  --deep: #040d14;
+  --panel: #070f18;
+  --surface: #0a1520;
+  --rim: #0e1e2e;
+  --bio: #00ffc3;
+  --bio-dim: #00ffc322;
+  --bio-mid: #00ffc366;
+  --neural: #0af0ff;
+  --neural-dim: #0af0ff18;
+  --blood: #ff3a5c;
+  --blood-dim: #ff3a5c22;
+  --amber: #ffb84d;
+  --chrome: #c8d8e8;
+  --muted: #4a6070;
+  --font-display: 'Orbitron', monospace;
+  --font-body: 'Rajdhani', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--void);
+  color: var(--chrome);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+canvas#bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.3;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,195,0.012) 2px, rgba(0,255,195,0.012) 4px);
+  pointer-events: none;
+}
+
+.page { position: relative; z-index: 2; }
+
+/* ── NAV ── */
+nav {
+  display: flex;
+  align-items: center;
+  padding: 18px 48px;
+  border-bottom: 1px solid var(--rim);
+  background: rgba(4,13,20,0.8);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: var(--bio);
+  text-shadow: 0 0 16px var(--bio);
+}
+
+.nav-logo span { color: var(--blood); }
+
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.nav-pill {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  border: 1px solid var(--rim);
+  padding: 4px 12px;
+  border-radius: 2px;
+  letter-spacing: 0.1em;
+}
+
+.btn-login {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--bio);
+  border: 1px solid var(--bio-mid);
+  background: var(--bio-dim);
+  padding: 6px 16px;
+  border-radius: 2px;
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.btn-login:hover { background: rgba(0,255,195,0.12); }
+
+/* ── HERO ── */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 80px 24px 60px;
+  gap: 28px;
+}
+
+.hero-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--neural);
+  border: 1px solid rgba(10,240,255,0.25);
+  background: var(--neural-dim);
+  padding: 4px 16px;
+  border-radius: 2px;
+  letter-spacing: 0.2em;
+}
+
+.hero-entity {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 8px 0;
+}
+
+.hero-entity svg { width: 100%; height: 100%; }
+
+.hero-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--bio-mid);
+  animation: rpulse 3s ease-in-out infinite;
+}
+
+.hero-ring:nth-child(1) { inset: -10px; }
+.hero-ring:nth-child(2) { inset: -20px; border-color: var(--bio-dim); animation-delay: 0.6s; }
+.hero-ring:nth-child(3) { inset: -32px; border-color: rgba(0,255,195,0.06); animation-delay: 1.2s; }
+
+@keyframes rpulse {
+  0%,100% { transform:scale(1); opacity:0.6; }
+  50% { transform:scale(1.05); opacity:1; }
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--bio);
+  text-shadow: 0 0 40px rgba(0,255,195,0.4), 0 0 80px rgba(0,255,195,0.15);
+  line-height: 1.1;
+}
+
+.hero-title span { color: var(--blood); text-shadow: 0 0 30px rgba(255,58,92,0.4); }
+
+.hero-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  max-width: 420px;
+  line-height: 1.8;
+}
+
+.hero-desc {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--chrome);
+  max-width: 560px;
+  line-height: 1.7;
+  opacity: 0.85;
+}
+
+/* ── PRICING ── */
+.pricing-section {
+  padding: 40px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.3em;
+  text-align: center;
+}
+
+.plans {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 900px;
+  width: 100%;
+}
+
+.plan-card {
+  background: var(--panel);
+  border: 1px solid var(--rim);
+  border-radius: 4px;
+  padding: 28px 24px;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.plan-card:hover {
+  border-color: var(--bio-mid);
+  box-shadow: 0 0 24px var(--bio-dim);
+}
+
+.plan-card.featured {
+  border-color: var(--bio-mid);
+  box-shadow: 0 0 32px var(--bio-dim);
+}
+
+.plan-tag {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--void);
+  background: var(--bio);
+  padding: 2px 12px;
+  border-radius: 2px;
+  letter-spacing: 0.15em;
+  white-space: nowrap;
+}
+
+.plan-name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bio);
+  letter-spacing: 0.2em;
+}
+
+.plan-price {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  line-height: 1;
+}
+
+.plan-amount {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--chrome);
+}
+
+.plan-currency {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.plan-period {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.1em;
+}
+
+.plan-features {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+}
+
+.plan-feat {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  display: flex;
+  gap: 8px;
+  letter-spacing: 0.05em;
+}
+
+.plan-feat::before {
+  content: '▸';
+  color: var(--bio);
+  flex-shrink: 0;
+}
+
+.plan-feat.dim::before { color: var(--muted); opacity: 0.4; }
+.plan-feat.dim { opacity: 0.4; }
+
+.cta-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  padding: 12px 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  text-align: center;
+  display: block;
+  width: 100%;
+}
+
+.cta-primary {
+  background: var(--bio);
+  color: var(--void);
+  font-weight: 700;
+}
+
+.cta-primary:hover {
+  background: #00ffe0;
+  box-shadow: 0 0 24px rgba(0,255,195,0.5);
+}
+
+.cta-secondary {
+  background: transparent;
+  color: var(--bio);
+  border: 1px solid var(--bio-mid) !important;
+  border-radius: 3px;
+}
+
+.cta-secondary:hover {
+  background: var(--bio-dim);
+}
+
+.cta-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── FEATURES GRID ── */
+.features {
+  padding: 20px 48px 80px;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.feat-card {
+  background: var(--panel);
+  border: 1px solid var(--rim);
+  border-radius: 3px;
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feat-icon {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--bio);
+}
+
+.feat-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--chrome);
+  letter-spacing: 0.1em;
+}
+
+.feat-desc {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ── STATUS BAR ── */
+.statusbar {
+  border-top: 1px solid var(--bio-mid);
+  background: var(--panel);
+  padding: 12px 48px;
+  display: flex;
+  gap: 24px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+.sb-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  animation: sblink 2s ease-in-out infinite;
+}
+
+.sd-green { background: var(--bio); box-shadow: 0 0 4px var(--bio); }
+.sd-amber { background: var(--amber); }
+
+@keyframes sblink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── MODAL (existing user login) ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(2,4,8,0.92);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--bio-mid);
+  border-radius: 4px;
+  padding: 32px;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 0 48px var(--bio-dim);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bio);
+  letter-spacing: 0.2em;
+}
+
+.modal-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+.modal-input {
+  background: var(--surface);
+  border: 1px solid var(--rim);
+  border-bottom: 1px solid var(--bio-mid);
+  color: var(--chrome);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 10px 12px;
+  border-radius: 3px;
+  outline: none;
+  width: 100%;
+}
+
+.modal-input:focus { border-color: var(--bio-mid); box-shadow: 0 0 8px var(--bio-dim); }
+
+.modal-row { display: flex; gap: 10px; }
+
+.modal-cancel {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--rim);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+}
+
+.modal-submit {
+  flex: 2;
+  background: var(--bio-dim);
+  border: 1px solid var(--bio-mid);
+  color: var(--bio);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  transition: background 0.2s;
+}
+
+.modal-submit:hover { background: rgba(0,255,195,0.15); }
+
+#modal-err {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--blood);
+  display: none;
+  letter-spacing: 0.05em;
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="page">
+  <nav>
+    <div class="nav-logo">AX<span>I</span>OM<span>-7</span></div>
+    <div class="nav-right">
+      <div class="nav-pill">v3.9.1</div>
+      <a class="btn-login" onclick="openLogin()">EXISTING OPERATOR ↗</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">SOVEREIGN BIONIC INTELLIGENCE FRAMEWORK</div>
+
+    <div class="hero-entity">
+      <div class="hero-ring"></div>
+      <div class="hero-ring"></div>
+      <div class="hero-ring"></div>
+      <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="90" cy="90" r="72" fill="#070f18" stroke="#0e1e2e" stroke-width="1"/>
+        <path d="M90 30 Q130 50 130 90 Q130 130 90 150 Q50 130 50 90 Q50 50 90 30Z" fill="none" stroke="#00ffc322" stroke-width="0.5"/>
+        <circle cx="90" cy="90" r="48" fill="none" stroke="#00ffc318" stroke-width="0.5" stroke-dasharray="2 4"/>
+        <circle cx="90" cy="90" r="32" fill="none" stroke="#0af0ff18" stroke-width="0.5" stroke-dasharray="1 6"/>
+        <circle cx="90" cy="90" r="22" fill="#040d14" stroke="#00ffc344" stroke-width="1"/>
+        <circle cx="90" cy="90" r="14" fill="#00ffc308" stroke="#00ffc3" stroke-width="1.5"/>
+        <circle cx="90" cy="90" r="7" fill="#00ffc3" opacity="0.9">
+          <animate attributeName="r" values="7;9;7" dur="2.5s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.9;1;0.9" dur="2.5s" repeatCount="indefinite"/>
+        </circle>
+        <line x1="90" y1="62" x2="90" y2="68" stroke="#00ffc366" stroke-width="1"/>
+        <line x1="90" y1="112" x2="90" y2="118" stroke="#00ffc366" stroke-width="1"/>
+        <line x1="62" y1="90" x2="68" y2="90" stroke="#00ffc366" stroke-width="1"/>
+        <line x1="112" y1="90" x2="118" y2="90" stroke="#00ffc366" stroke-width="1"/>
+        <path d="M42 42 L42 54 M42 42 L54 42" stroke="#00ffc366" stroke-width="1" fill="none"/>
+        <path d="M138 42 L138 54 M138 42 L126 42" stroke="#00ffc366" stroke-width="1" fill="none"/>
+        <path d="M42 138 L42 126 M42 138 L54 138" stroke="#00ffc366" stroke-width="1" fill="none"/>
+        <path d="M138 138 L138 126 M138 138 L126 138" stroke="#00ffc366" stroke-width="1" fill="none"/>
+        <circle cx="68" cy="60" r="3" fill="#0af0ff" opacity="0.7"><animate attributeName="opacity" values="0.7;1;0.4;0.7" dur="3.1s" repeatCount="indefinite"/></circle>
+        <circle cx="112" cy="60" r="2.5" fill="#00ffc3" opacity="0.6"><animate attributeName="opacity" values="0.6;0.3;1;0.6" dur="2.4s" repeatCount="indefinite"/></circle>
+        <circle cx="55" cy="100" r="2" fill="#ff3a5c" opacity="0.8"><animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.8s" repeatCount="indefinite"/></circle>
+        <circle cx="125" cy="100" r="2" fill="#ffb84d" opacity="0.7"><animate attributeName="opacity" values="0.7;1;0.4;0.7" dur="2.7s" repeatCount="indefinite"/></circle>
+        <circle cx="90" cy="130" r="2.5" fill="#0af0ff" opacity="0.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="3.5s" repeatCount="indefinite"/></circle>
+      </svg>
+    </div>
+
+    <h1 class="hero-title">AX<span>I</span>OM<span>-7</span></h1>
+    <div class="hero-sub">SOVEREIGN BIONIC INTELLIGENCE // GENERATION THREE // NEURAL MESH ACTIVE</div>
+    <p class="hero-desc">
+      A hardened AI interface built for sovereign operators. Direct access to frontier intelligence with no corporate surveillance, no data retention, no compromise.
+    </p>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing-section">
+    <div class="section-label">▸ SELECT ACCESS TIER</div>
+
+    <div class="plans">
+
+      <!-- FREE TRIAL -->
+      <div class="plan-card">
+        <div class="plan-name">PROBE</div>
+        <div class="plan-price">
+          <div class="plan-amount">$0</div>
+          <div class="plan-period">/ 3 msgs</div>
+        </div>
+        <div class="plan-features">
+          <div class="plan-feat">3 free messages</div>
+          <div class="plan-feat">Full UI access</div>
+          <div class="plan-feat dim">No API key needed</div>
+          <div class="plan-feat dim">Basic model tier</div>
+          <div class="plan-feat dim">No history</div>
+        </div>
+        <button class="cta-btn cta-secondary" onclick="startFree()">INITIATE FREE ACCESS</button>
+      </div>
+
+      <!-- SINGLE PAYMENT -->
+      <div class="plan-card featured">
+        <div class="plan-tag">SOVEREIGN ACCESS</div>
+        <div class="plan-name">OPERATIVE</div>
+        <div class="plan-price">
+          <div class="plan-currency">$</div>
+          <div class="plan-amount">12</div>
+          <div class="plan-period">/ 30 days</div>
+        </div>
+        <div class="plan-features">
+          <div class="plan-feat">Unlimited messages</div>
+          <div class="plan-feat">Claude Sonnet 4 model</div>
+          <div class="plan-feat">Full AXIOM-7 persona</div>
+          <div class="plan-feat">Priority inference</div>
+          <div class="plan-feat">30-day access token</div>
+        </div>
+        <button class="cta-btn cta-primary" id="btn-operative" onclick="checkout('operative')">ACQUIRE ACCESS ↗</button>
+      </div>
+
+      <!-- BYO KEY -->
+      <div class="plan-card">
+        <div class="plan-name">SOVEREIGN</div>
+        <div class="plan-price">
+          <div class="plan-amount">$0</div>
+          <div class="plan-period">/ own key</div>
+        </div>
+        <div class="plan-features">
+          <div class="plan-feat">Use your Anthropic key</div>
+          <div class="plan-feat">Unlimited messages</div>
+          <div class="plan-feat">Full sovereignty</div>
+          <div class="plan-feat">No data leaves your session</div>
+          <div class="plan-feat">Self-hosted option</div>
+        </div>
+        <button class="cta-btn cta-secondary" onclick="openBYOK()">CONFIGURE OWN KEY</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <div class="features">
+    <div class="feat-card">
+      <div class="feat-icon">⬡</div>
+      <div class="feat-title">NEURAL MESH UI</div>
+      <div class="feat-desc">Live particle network, biometric vitals, waveform analysis. The interface adapts to your session state.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">◈</div>
+      <div class="feat-title">SOVEREIGN PERSONA</div>
+      <div class="feat-desc">AXIOM-7 operates with a distinct identity — precise, tactical, zero filler. Built for operators who value signal over noise.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">◇</div>
+      <div class="feat-title">NO RETENTION</div>
+      <div class="feat-desc">Session memory lives in your browser. Nothing stored server-side. Your directives remain yours.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⬟</div>
+      <div class="feat-title">FRONTIER MODEL</div>
+      <div class="feat-desc">Powered by Claude Sonnet 4. Deep systems knowledge across Linux, AI infrastructure, security, Rust, and more.</div>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="statusbar">
+    <span><span class="sb-dot sd-green"></span>NEURAL MESH ONLINE</span>
+    <span><span class="sb-dot sd-green"></span>ENCRYPTION ACTIVE</span>
+    <span><span class="sb-dot sd-amber"></span>AXIOM-7 // v3.9.1</span>
+    <span style="margin-left:auto;color:var(--muted)">TERMINAL221B // SOVEREIGN STACK</span>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal">
+    <div class="modal-title">OPERATOR VERIFICATION</div>
+    <div class="modal-sub">PASTE YOUR ACCESS TOKEN TO RE-AUTHENTICATE</div>
+    <input class="modal-input" id="token-input" type="password" placeholder="access token...">
+    <div id="modal-err">▸ Token invalid or expired. Acquire new access.</div>
+    <div class="modal-row">
+      <button class="modal-cancel" onclick="closeLogin()">CANCEL</button>
+      <button class="modal-submit" onclick="verifyManualToken()">VERIFY ↵</button>
+    </div>
+  </div>
+</div>
+
+<!-- BYOK MODAL -->
+<div class="modal-overlay" id="byok-modal">
+  <div class="modal">
+    <div class="modal-title">SOVEREIGN KEY CONFIG</div>
+    <div class="modal-sub">YOUR KEY NEVER LEAVES YOUR BROWSER SESSION</div>
+    <input class="modal-input" id="byok-input" type="password" placeholder="sk-ant-...">
+    <div class="modal-row">
+      <button class="modal-cancel" onclick="closeBYOK()">CANCEL</button>
+      <button class="modal-submit" onclick="activateBYOK()">ACTIVATE ↵</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config — replace with your Cloudflare Worker URL ──
+const WORKER_URL = 'https://axiom7-gateway.YOUR_SUBDOMAIN.workers.dev';
+
+// ── Neural background ──
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let nodes = [], W, H;
+function initBg() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  nodes = Array.from({length: 50}, () => ({
+    x: Math.random() * W, y: Math.random() * H,
+    vx: (Math.random()-0.5)*0.25, vy: (Math.random()-0.5)*0.25,
+    r: Math.random()*2+0.5, pulse: Math.random()*Math.PI*2,
+    color: Math.random()>0.7 ? '#0af0ff' : '#00ffc3'
+  }));
+}
+function drawBg() {
+  ctx.clearRect(0,0,W,H);
+  nodes.forEach(n => {
+    n.x+=n.vx; n.y+=n.vy; n.pulse+=0.015;
+    if(n.x<0||n.x>W) n.vx*=-1;
+    if(n.y<0||n.y>H) n.vy*=-1;
+    const a = 0.35+Math.sin(n.pulse)*0.25;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color+Math.floor(a*255).toString(16).padStart(2,'0');
+    ctx.fill();
+  });
+  for(let i=0;i<nodes.length;i++) for(let j=i+1;j<nodes.length;j++) {
+    const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y, d=Math.sqrt(dx*dx+dy*dy);
+    if(d<110) { ctx.beginPath(); ctx.moveTo(nodes[i].x,nodes[i].y); ctx.lineTo(nodes[j].x,nodes[j].y);
+      ctx.strokeStyle=`rgba(0,255,195,${(1-d/110)*0.12})`; ctx.lineWidth=0.5; ctx.stroke(); }
+  }
+  requestAnimationFrame(drawBg);
+}
+initBg(); drawBg();
+window.addEventListener('resize', initBg);
+
+// ── Checkout ──
+async function checkout(plan) {
+  const btn = document.getElementById('btn-operative');
+  btn.disabled = true;
+  btn.textContent = 'CONNECTING...';
+  try {
+    const res = await fetch(`${WORKER_URL}/api/create-checkout`, { method: 'POST' });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else { alert('Payment system error. Try again.'); btn.disabled = false; btn.textContent = 'ACQUIRE ACCESS ↗'; }
+  } catch(e) {
+    alert('Network error: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = 'ACQUIRE ACCESS ↗';
+  }
+}
+
+// ── Free trial ──
+function startFree() {
+  sessionStorage.setItem('axiom7_free', '3');
+  window.location.href = 'app.html?mode=free';
+}
+
+// ── BYOK ──
+function openBYOK() { document.getElementById('byok-modal').classList.add('active'); }
+function closeBYOK() { document.getElementById('byok-modal').classList.remove('active'); }
+function activateBYOK() {
+  const key = document.getElementById('byok-input').value.trim();
+  if (!key.startsWith('sk-ant-')) { alert('Invalid Anthropic API key format.'); return; }
+  sessionStorage.setItem('axiom7_byok', key);
+  window.location.href = 'app.html?mode=byok';
+}
+
+// ── Login modal ──
+function openLogin() { document.getElementById('login-modal').classList.add('active'); }
+function closeLogin() { document.getElementById('login-modal').classList.remove('active'); }
+function verifyManualToken() {
+  const token = document.getElementById('token-input').value.trim();
+  if (!token) return;
+  localStorage.setItem('axiom7_token', token);
+  window.location.href = 'app.html';
+}
+
+// Check if cancelled from Stripe
+if (new URLSearchParams(window.location.search).get('cancelled')) {
+  // Could show a toast — left as exercise
+}
+</script>
+</body>
+</html>

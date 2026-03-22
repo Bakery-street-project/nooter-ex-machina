@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AXIOM-7 // Sovereign Bionic Intelligence</title>
+<title>AXIOM-7 // Bionic Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -20,389 +20,600 @@
   --blood: #ff3a5c;
   --blood-dim: #ff3a5c22;
   --amber: #ffb84d;
+  --amber-dim: #ffb84d22;
   --chrome: #c8d8e8;
   --muted: #4a6070;
   --font-display: 'Orbitron', monospace;
   --font-body: 'Rajdhani', sans-serif;
   --font-mono: 'Share Tech Mono', monospace;
 }
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   background: var(--void);
   color: var(--chrome);
   font-family: var(--font-body);
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-canvas#bg {
+/* ── Neural canvas background ── */
+#neural-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
-  opacity: 0.3;
+  opacity: 0.35;
 }
 
+/* ── Scan line overlay ── */
 body::after {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 1;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,195,0.012) 2px, rgba(0,255,195,0.012) 4px);
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,255,195,0.015) 2px,
+    rgba(0,255,195,0.015) 4px
+  );
   pointer-events: none;
 }
 
-.page { position: relative; z-index: 2; }
+/* ── Layout ── */
+.shell {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 260px 1fr 220px;
+  grid-template-rows: 56px 1fr 52px;
+  height: 100vh;
+  gap: 1px;
+  background: var(--muted);
+}
 
-/* ── NAV ── */
-nav {
+/* ── Header bar ── */
+.topbar {
+  grid-column: 1 / -1;
+  background: var(--deep);
   display: flex;
   align-items: center;
-  padding: 18px 48px;
-  border-bottom: 1px solid var(--rim);
-  background: rgba(4,13,20,0.8);
-  backdrop-filter: blur(8px);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  padding: 0 20px;
+  gap: 20px;
+  border-bottom: 1px solid var(--bio-mid);
 }
 
-.nav-logo {
+.logo {
   font-family: var(--font-display);
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 900;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
   color: var(--bio);
-  text-shadow: 0 0 16px var(--bio);
+  text-shadow: 0 0 20px var(--bio);
 }
 
-.nav-logo span { color: var(--blood); }
+.logo span { color: var(--blood); }
 
-.nav-right {
-  margin-left: auto;
+.topbar-status {
   display: flex;
   gap: 16px;
+  margin-left: auto;
   align-items: center;
 }
 
-.nav-pill {
+.status-pill {
   font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--muted);
-  border: 1px solid var(--rim);
-  padding: 4px 12px;
+  font-size: 10px;
+  padding: 3px 10px;
   border-radius: 2px;
+  border: 1px solid currentColor;
   letter-spacing: 0.1em;
 }
 
-.btn-login {
+.pill-online { color: var(--bio); border-color: var(--bio-mid); background: var(--bio-dim); }
+.pill-warn { color: var(--amber); border-color: var(--amber-dim); background: var(--amber-dim); }
+
+.heartbeat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--bio);
-  border: 1px solid var(--bio-mid);
-  background: var(--bio-dim);
-  padding: 6px 16px;
-  border-radius: 2px;
-  cursor: pointer;
-  letter-spacing: 0.12em;
-  text-decoration: none;
-  transition: background 0.2s;
+  color: var(--muted);
 }
 
-.btn-login:hover { background: rgba(0,255,195,0.12); }
+.heartbeat-line {
+  width: 60px;
+  height: 20px;
+}
 
-/* ── HERO ── */
-.hero {
+/* ── Left panel: AXIOM entity ── */
+.panel-left {
+  background: var(--panel);
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  padding: 80px 24px 60px;
-  gap: 28px;
+  padding: 20px 12px;
+  gap: 14px;
+  overflow: hidden;
 }
 
-.hero-badge {
+.entity-frame {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+
+.entity-frame svg {
+  width: 100%;
+  height: 100%;
+}
+
+.entity-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px solid var(--bio-mid);
+  animation: ring-pulse 3s ease-in-out infinite;
+}
+
+.entity-ring:nth-child(2) {
+  inset: -16px;
+  border-color: var(--bio-dim);
+  animation-delay: 0.5s;
+}
+
+.entity-ring:nth-child(3) {
+  inset: -26px;
+  border-color: rgba(0,255,195,0.08);
+  animation-delay: 1s;
+}
+
+@keyframes ring-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+
+.entity-id {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bio);
+  letter-spacing: 0.2em;
+  text-align: center;
+  text-shadow: 0 0 12px var(--bio);
+}
+
+.entity-class {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  text-align: center;
+}
+
+/* Vitals */
+.vitals {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.vital-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.vital-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+.vital-val { color: var(--bio); }
+
+.vital-bar {
+  height: 3px;
+  background: var(--surface);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.vital-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 1s ease;
+  position: relative;
+}
+
+.vital-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 8px;
+  background: rgba(255,255,255,0.4);
+  filter: blur(2px);
+}
+
+.vf-bio { background: var(--bio); box-shadow: 0 0 6px var(--bio); }
+.vf-neural { background: var(--neural); box-shadow: 0 0 6px var(--neural); }
+.vf-blood { background: var(--blood); box-shadow: 0 0 6px var(--blood); }
+.vf-amber { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+
+/* Memory trace */
+.memory-trace {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--rim);
+  border-radius: 3px;
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.memory-trace .mt-title {
+  color: var(--neural);
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  margin-bottom: 4px;
+}
+
+.memory-item { display: flex; gap: 6px; }
+.mi-time { color: rgba(0,240,255,0.4); }
+.mi-text { color: var(--muted); }
+
+/* ── Center: Chat ── */
+.panel-center {
+  background: var(--deep);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-header {
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--rim);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--panel);
+}
+
+.chat-header-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+}
+
+.mode-badge {
+  margin-left: auto;
   font-family: var(--font-mono);
   font-size: 9px;
   color: var(--neural);
-  border: 1px solid rgba(10,240,255,0.25);
+  border: 1px solid rgba(10,240,255,0.3);
+  padding: 2px 8px;
+  border-radius: 2px;
   background: var(--neural-dim);
-  padding: 4px 16px;
-  border-radius: 2px;
-  letter-spacing: 0.2em;
-}
-
-.hero-entity {
-  position: relative;
-  width: 160px;
-  height: 160px;
-  margin: 8px 0;
-}
-
-.hero-entity svg { width: 100%; height: 100%; }
-
-.hero-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid var(--bio-mid);
-  animation: rpulse 3s ease-in-out infinite;
-}
-
-.hero-ring:nth-child(1) { inset: -10px; }
-.hero-ring:nth-child(2) { inset: -20px; border-color: var(--bio-dim); animation-delay: 0.6s; }
-.hero-ring:nth-child(3) { inset: -32px; border-color: rgba(0,255,195,0.06); animation-delay: 1.2s; }
-
-@keyframes rpulse {
-  0%,100% { transform:scale(1); opacity:0.6; }
-  50% { transform:scale(1.05); opacity:1; }
-}
-
-.hero-title {
-  font-family: var(--font-display);
-  font-size: clamp(36px, 6vw, 64px);
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  color: var(--bio);
-  text-shadow: 0 0 40px rgba(0,255,195,0.4), 0 0 80px rgba(0,255,195,0.15);
-  line-height: 1.1;
-}
-
-.hero-title span { color: var(--blood); text-shadow: 0 0 30px rgba(255,58,92,0.4); }
-
-.hero-sub {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.2em;
-  max-width: 420px;
-  line-height: 1.8;
-}
-
-.hero-desc {
-  font-family: var(--font-body);
-  font-size: 18px;
-  font-weight: 300;
-  color: var(--chrome);
-  max-width: 560px;
-  line-height: 1.7;
-  opacity: 0.85;
-}
-
-/* ── PRICING ── */
-.pricing-section {
-  padding: 40px 24px 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
-}
-
-.section-label {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--muted);
-  letter-spacing: 0.3em;
-  text-align: center;
-}
-
-.plans {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-  max-width: 900px;
-  width: 100%;
-}
-
-.plan-card {
-  background: var(--panel);
-  border: 1px solid var(--rim);
-  border-radius: 4px;
-  padding: 28px 24px;
-  width: 260px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  position: relative;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.plan-card:hover {
-  border-color: var(--bio-mid);
-  box-shadow: 0 0 24px var(--bio-dim);
-}
-
-.plan-card.featured {
-  border-color: var(--bio-mid);
-  box-shadow: 0 0 32px var(--bio-dim);
-}
-
-.plan-tag {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-mono);
-  font-size: 8px;
-  color: var(--void);
-  background: var(--bio);
-  padding: 2px 12px;
-  border-radius: 2px;
-  letter-spacing: 0.15em;
-  white-space: nowrap;
-}
-
-.plan-name {
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--bio);
-  letter-spacing: 0.2em;
-}
-
-.plan-price {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  line-height: 1;
-}
-
-.plan-amount {
-  font-family: var(--font-display);
-  font-size: 36px;
-  font-weight: 900;
-  color: var(--chrome);
-}
-
-.plan-currency {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-
-.plan-period {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--muted);
-  margin-bottom: 6px;
   letter-spacing: 0.1em;
 }
 
-.plan-features {
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  flex: 1;
+  gap: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rim) transparent;
 }
 
-.plan-feat {
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--rim); border-radius: 2px; }
+
+/* Message bubbles */
+.msg {
+  display: flex;
+  gap: 12px;
+  animation: msg-in 0.3s ease forwards;
+}
+
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg-user { flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-mono);
   font-size: 9px;
-  color: var(--muted);
-  display: flex;
-  gap: 8px;
+  font-weight: 700;
   letter-spacing: 0.05em;
 }
 
-.plan-feat::before {
-  content: '▸';
+.avatar-axiom {
+  background: var(--bio-dim);
+  border: 1px solid var(--bio-mid);
   color: var(--bio);
-  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
 }
 
-.plan-feat.dim::before { color: var(--muted); opacity: 0.4; }
-.plan-feat.dim { opacity: 0.4; }
+.avatar-axiom::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(0,255,195,0.15) 100%);
+}
 
-.cta-btn {
+.avatar-user {
+  background: var(--blood-dim);
+  border: 1px solid rgba(255,58,92,0.3);
+  color: var(--blood);
+}
+
+.msg-bubble {
+  max-width: 78%;
+  padding: 10px 14px;
+  border-radius: 3px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.65;
+  letter-spacing: 0.02em;
+}
+
+.bubble-axiom {
+  background: var(--surface);
+  border: 1px solid var(--rim);
+  border-left: 2px solid var(--bio-mid);
+  color: var(--chrome);
+  position: relative;
+}
+
+.bubble-axiom::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--bio-mid), transparent);
+}
+
+.bubble-user {
+  background: rgba(255,58,92,0.08);
+  border: 1px solid rgba(255,58,92,0.2);
+  border-right: 2px solid rgba(255,58,92,0.4);
+  color: var(--chrome);
+}
+
+.msg-meta {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--muted);
+  margin-top: 4px;
+  letter-spacing: 0.08em;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.msg-meta .latency { color: var(--bio); }
+
+/* Thinking state */
+.thinking-dots {
+  display: flex;
+  gap: 5px;
+  padding: 4px 0;
+}
+
+.thinking-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--bio);
+  animation: dot-pulse 1.2s ease-in-out infinite;
+}
+
+.thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Input */
+.chat-input-area {
+  padding: 14px 20px;
+  background: var(--panel);
+  border-top: 1px solid var(--rim);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.input-wrap {
+  flex: 1;
+  position: relative;
+}
+
+.input-wrap::before {
+  content: '▸';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--bio);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+#user-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--rim);
+  border-bottom: 1px solid var(--bio-mid);
+  color: var(--chrome);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 10px 12px 10px 28px;
+  border-radius: 3px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  resize: none;
+  height: 42px;
+}
+
+#user-input:focus {
+  border-color: var(--bio-mid);
+  box-shadow: 0 0 12px var(--bio-dim);
+}
+
+#user-input::placeholder {
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+.send-btn {
+  background: var(--bio-dim);
+  border: 1px solid var(--bio-mid);
+  color: var(--bio);
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.15em;
-  padding: 12px 20px;
+  padding: 0 16px;
+  height: 42px;
   border-radius: 3px;
   cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-  text-align: center;
-  display: block;
-  width: 100%;
+  letter-spacing: 0.15em;
+  transition: background 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
 }
 
-.cta-primary {
-  background: var(--bio);
-  color: var(--void);
-  font-weight: 700;
+.send-btn:hover {
+  background: rgba(0,255,195,0.15);
+  box-shadow: 0 0 16px var(--bio-dim);
 }
 
-.cta-primary:hover {
-  background: #00ffe0;
-  box-shadow: 0 0 24px rgba(0,255,195,0.5);
-}
-
-.cta-secondary {
-  background: transparent;
-  color: var(--bio);
-  border: 1px solid var(--bio-mid) !important;
-  border-radius: 3px;
-}
-
-.cta-secondary:hover {
-  background: var(--bio-dim);
-}
-
-.cta-btn:disabled {
-  opacity: 0.5;
+.send-btn:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-/* ── FEATURES GRID ── */
-.features {
-  padding: 20px 48px 80px;
-  max-width: 1000px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-}
-
-.feat-card {
+/* ── Right panel: Intel feed ── */
+.panel-right {
   background: var(--panel);
-  border: 1px solid var(--rim);
-  border-radius: 3px;
-  padding: 20px 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  padding: 16px 12px;
+  gap: 14px;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
-.feat-icon {
+.panel-right::-webkit-scrollbar { display: none; }
+
+.intel-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.intel-title {
   font-family: var(--font-mono);
-  font-size: 16px;
-  color: var(--bio);
+  font-size: 8px;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--rim);
 }
 
-.feat-title {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--chrome);
+.intel-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.intel-key {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--muted);
   letter-spacing: 0.1em;
 }
 
-.feat-desc {
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 300;
-  color: var(--muted);
-  line-height: 1.6;
+.intel-val {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--chrome);
 }
 
-/* ── STATUS BAR ── */
-.statusbar {
-  border-top: 1px solid var(--bio-mid);
-  background: var(--panel);
-  padding: 12px 48px;
+.intel-val.hi { color: var(--bio); }
+.intel-val.warn { color: var(--amber); }
+.intel-val.danger { color: var(--blood); }
+
+/* Waveform */
+.waveform {
+  width: 100%;
+  height: 36px;
+}
+
+/* Log feed */
+.log-feed {
   display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.log-line {
+  color: var(--muted);
+  display: flex;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.log-time { color: rgba(0,255,195,0.35); flex-shrink: 0; }
+.log-evt { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-ok { color: var(--bio); }
+.log-warn { color: var(--amber); }
+.log-err { color: var(--blood); }
+
+/* ── Bottom bar ── */
+.bottombar {
+  grid-column: 1 / -1;
+  background: var(--panel);
+  border-top: 1px solid var(--bio-mid);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
   gap: 24px;
   font-family: var(--font-mono);
   font-size: 9px;
@@ -410,376 +621,552 @@ nav {
   letter-spacing: 0.08em;
 }
 
-.sb-dot {
-  width: 5px; height: 5px;
+.bar-item { display: flex; gap: 6px; align-items: center; }
+.bar-dot {
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  display: inline-block;
-  margin-right: 6px;
-  animation: sblink 2s ease-in-out infinite;
+  animation: bar-blink 2s ease-in-out infinite;
 }
 
-.sd-green { background: var(--bio); box-shadow: 0 0 4px var(--bio); }
-.sd-amber { background: var(--amber); }
+.bd-green { background: var(--bio); box-shadow: 0 0 4px var(--bio); }
+.bd-amber { background: var(--amber); box-shadow: 0 0 4px var(--amber); }
+.bd-red { background: var(--blood); box-shadow: 0 0 4px var(--blood); }
 
-@keyframes sblink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-/* ── MODAL (existing user login) ── */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgba(2,4,8,0.92);
-  align-items: center;
-  justify-content: center;
+@keyframes bar-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
-.modal-overlay.active { display: flex; }
+.bar-spacer { flex: 1; }
 
-.modal {
-  background: var(--panel);
-  border: 1px solid var(--bio-mid);
-  border-radius: 4px;
-  padding: 32px;
-  width: 360px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  box-shadow: 0 0 48px var(--bio-dim);
-}
-
-.modal-title {
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 700;
+#clock {
   color: var(--bio);
-  letter-spacing: 0.2em;
-}
-
-.modal-sub {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--muted);
   letter-spacing: 0.1em;
 }
 
-.modal-input {
-  background: var(--surface);
-  border: 1px solid var(--rim);
-  border-bottom: 1px solid var(--bio-mid);
-  color: var(--chrome);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  padding: 10px 12px;
-  border-radius: 3px;
-  outline: none;
-  width: 100%;
-}
-
-.modal-input:focus { border-color: var(--bio-mid); box-shadow: 0 0 8px var(--bio-dim); }
-
-.modal-row { display: flex; gap: 10px; }
-
-.modal-cancel {
-  flex: 1;
-  background: transparent;
-  border: 1px solid var(--rim);
-  color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  padding: 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  letter-spacing: 0.1em;
-}
-
-.modal-submit {
-  flex: 2;
-  background: var(--bio-dim);
-  border: 1px solid var(--bio-mid);
-  color: var(--bio);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  padding: 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  letter-spacing: 0.12em;
-  transition: background 0.2s;
-}
-
-.modal-submit:hover { background: rgba(0,255,195,0.15); }
-
-#modal-err {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--blood);
-  display: none;
-  letter-spacing: 0.05em;
+/* ── Waveform animation ── */
+@keyframes wave-active {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
 }
 </style>
 </head>
 <body>
 
-<canvas id="bg"></canvas>
+<canvas id="neural-bg"></canvas>
 
-<div class="page">
-  <nav>
-    <div class="nav-logo">AX<span>I</span>OM<span>-7</span></div>
-    <div class="nav-right">
-      <div class="nav-pill">v3.9.1</div>
-      <a class="btn-login" onclick="openLogin()">EXISTING OPERATOR ↗</a>
+<div class="shell">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="logo">AX<span>I</span>OM<span>-7</span></div>
+    <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:0.15em">BIONIC INTELLIGENCE FRAMEWORK // v4.0.0 // NVIDIA NIM</div>
+    <div class="topbar-status">
+      <div class="heartbeat">
+        <svg class="heartbeat-line" viewBox="0 0 60 20" fill="none">
+          <polyline points="0,10 8,10 12,3 16,17 20,10 28,10 32,6 36,14 40,10 60,10"
+            stroke="#00ffc3" stroke-width="1" fill="none" stroke-linejoin="round"/>
+        </svg>
+        NEURAL ACTIVE
+      </div>
+      <div class="status-pill pill-online">ONLINE</div>
+      <div class="status-pill pill-warn">GTX1080 PENDING</div>
     </div>
-  </nav>
+  </div>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-badge">SOVEREIGN BIONIC INTELLIGENCE FRAMEWORK</div>
-
-    <div class="hero-entity">
-      <div class="hero-ring"></div>
-      <div class="hero-ring"></div>
-      <div class="hero-ring"></div>
+  <!-- LEFT PANEL -->
+  <div class="panel-left">
+    <div class="entity-frame">
+      <div class="entity-ring"></div>
+      <div class="entity-ring"></div>
+      <div class="entity-ring"></div>
       <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer skull/head shape -->
         <circle cx="90" cy="90" r="72" fill="#070f18" stroke="#0e1e2e" stroke-width="1"/>
-        <path d="M90 30 Q130 50 130 90 Q130 130 90 150 Q50 130 50 90 Q50 50 90 30Z" fill="none" stroke="#00ffc322" stroke-width="0.5"/>
+        <!-- Brain hemisphere lines -->
+        <path d="M90 30 Q130 50 130 90 Q130 130 90 150 Q50 130 50 90 Q50 50 90 30Z"
+          fill="none" stroke="#00ffc322" stroke-width="0.5"/>
+        <!-- Neural mesh -->
         <circle cx="90" cy="90" r="48" fill="none" stroke="#00ffc318" stroke-width="0.5" stroke-dasharray="2 4"/>
         <circle cx="90" cy="90" r="32" fill="none" stroke="#0af0ff18" stroke-width="0.5" stroke-dasharray="1 6"/>
+        <!-- Core eye -->
         <circle cx="90" cy="90" r="22" fill="#040d14" stroke="#00ffc344" stroke-width="1"/>
         <circle cx="90" cy="90" r="14" fill="#00ffc308" stroke="#00ffc3" stroke-width="1.5"/>
         <circle cx="90" cy="90" r="7" fill="#00ffc3" opacity="0.9">
           <animate attributeName="r" values="7;9;7" dur="2.5s" repeatCount="indefinite"/>
           <animate attributeName="opacity" values="0.9;1;0.9" dur="2.5s" repeatCount="indefinite"/>
         </circle>
+        <!-- Biometric cross hairs -->
         <line x1="90" y1="62" x2="90" y2="68" stroke="#00ffc366" stroke-width="1"/>
         <line x1="90" y1="112" x2="90" y2="118" stroke="#00ffc366" stroke-width="1"/>
         <line x1="62" y1="90" x2="68" y2="90" stroke="#00ffc366" stroke-width="1"/>
         <line x1="112" y1="90" x2="118" y2="90" stroke="#00ffc366" stroke-width="1"/>
+        <!-- Corner brackets -->
         <path d="M42 42 L42 54 M42 42 L54 42" stroke="#00ffc366" stroke-width="1" fill="none"/>
         <path d="M138 42 L138 54 M138 42 L126 42" stroke="#00ffc366" stroke-width="1" fill="none"/>
         <path d="M42 138 L42 126 M42 138 L54 138" stroke="#00ffc366" stroke-width="1" fill="none"/>
         <path d="M138 138 L138 126 M138 138 L126 138" stroke="#00ffc366" stroke-width="1" fill="none"/>
-        <circle cx="68" cy="60" r="3" fill="#0af0ff" opacity="0.7"><animate attributeName="opacity" values="0.7;1;0.4;0.7" dur="3.1s" repeatCount="indefinite"/></circle>
-        <circle cx="112" cy="60" r="2.5" fill="#00ffc3" opacity="0.6"><animate attributeName="opacity" values="0.6;0.3;1;0.6" dur="2.4s" repeatCount="indefinite"/></circle>
-        <circle cx="55" cy="100" r="2" fill="#ff3a5c" opacity="0.8"><animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.8s" repeatCount="indefinite"/></circle>
-        <circle cx="125" cy="100" r="2" fill="#ffb84d" opacity="0.7"><animate attributeName="opacity" values="0.7;1;0.4;0.7" dur="2.7s" repeatCount="indefinite"/></circle>
-        <circle cx="90" cy="130" r="2.5" fill="#0af0ff" opacity="0.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="3.5s" repeatCount="indefinite"/></circle>
+        <!-- Neural nodes -->
+        <circle cx="68" cy="60" r="3" fill="#0af0ff" opacity="0.7">
+          <animate attributeName="opacity" values="0.7;1;0.4;0.7" dur="3.1s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="112" cy="60" r="2.5" fill="#00ffc3" opacity="0.6">
+          <animate attributeName="opacity" values="0.6;0.3;1;0.6" dur="2.4s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="55" cy="100" r="2" fill="#ff3a5c" opacity="0.8">
+          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="125" cy="100" r="2" fill="#ffb84d" opacity="0.7">
+          <animate attributeName="opacity" values="0.7;1;0.4;0.7" dur="2.7s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="90" cy="130" r="2.5" fill="#0af0ff" opacity="0.5">
+          <animate attributeName="opacity" values="0.5;1;0.5" dur="3.5s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Connection lines -->
+        <line x1="68" y1="63" x2="83" y2="83" stroke="#0af0ff22" stroke-width="0.5"/>
+        <line x1="112" y1="63" x2="97" y2="83" stroke="#00ffc322" stroke-width="0.5"/>
+        <line x1="57" y1="100" x2="76" y2="90" stroke="#ff3a5c22" stroke-width="0.5"/>
+        <line x1="125" y1="100" x2="104" y2="90" stroke="#ffb84d22" stroke-width="0.5"/>
+        <line x1="90" y1="127" x2="90" y2="104" stroke="#0af0ff22" stroke-width="0.5"/>
+        <!-- Spine connector bottom -->
+        <line x1="90" y1="150" x2="90" y2="162" stroke="#00ffc366" stroke-width="1.5"/>
+        <circle cx="90" cy="164" r="2" fill="#00ffc366"/>
       </svg>
     </div>
 
-    <h1 class="hero-title">AX<span>I</span>OM<span>-7</span></h1>
-    <div class="hero-sub">SOVEREIGN BIONIC INTELLIGENCE // GENERATION THREE // NEURAL MESH ACTIVE</div>
-    <p class="hero-desc">
-      A hardened AI interface built for sovereign operators. Direct access to frontier intelligence with no corporate surveillance, no data retention, no compromise.
-    </p>
-  </section>
+    <div class="entity-id">AXIOM-7</div>
+    <div class="entity-class">SOVEREIGN BIONIC INTELLIGENCE</div>
 
-  <!-- PRICING -->
-  <section class="pricing-section">
-    <div class="section-label">▸ SELECT ACCESS TIER</div>
-
-    <div class="plans">
-
-      <!-- FREE TRIAL -->
-      <div class="plan-card">
-        <div class="plan-name">PROBE</div>
-        <div class="plan-price">
-          <div class="plan-amount">$0</div>
-          <div class="plan-period">/ 3 msgs</div>
-        </div>
-        <div class="plan-features">
-          <div class="plan-feat">3 free messages</div>
-          <div class="plan-feat">Full UI access</div>
-          <div class="plan-feat dim">No API key needed</div>
-          <div class="plan-feat dim">Basic model tier</div>
-          <div class="plan-feat dim">No history</div>
-        </div>
-        <button class="cta-btn cta-secondary" onclick="startFree()">INITIATE FREE ACCESS</button>
+    <div class="vitals">
+      <div class="vital-row">
+        <div class="vital-label"><span>NEURAL LOAD</span><span class="vital-val" id="v-neural">78%</span></div>
+        <div class="vital-bar"><div class="vital-fill vf-bio" id="vb-neural" style="width:78%"></div></div>
       </div>
-
-      <!-- SINGLE PAYMENT -->
-      <div class="plan-card featured">
-        <div class="plan-tag">SOVEREIGN ACCESS</div>
-        <div class="plan-name">OPERATIVE</div>
-        <div class="plan-price">
-          <div class="plan-currency">$</div>
-          <div class="plan-amount">12</div>
-          <div class="plan-period">/ 30 days</div>
-        </div>
-        <div class="plan-features">
-          <div class="plan-feat">Unlimited messages</div>
-          <div class="plan-feat">Claude Sonnet 4 model</div>
-          <div class="plan-feat">Full AXIOM-7 persona</div>
-          <div class="plan-feat">Priority inference</div>
-          <div class="plan-feat">30-day access token</div>
-        </div>
-        <button class="cta-btn cta-primary" id="btn-operative" onclick="checkout('operative')">ACQUIRE ACCESS ↗</button>
+      <div class="vital-row">
+        <div class="vital-label"><span>SYNAPSE RATE</span><span class="vital-val" id="v-syn">94%</span></div>
+        <div class="vital-bar"><div class="vital-fill vf-neural" id="vb-syn" style="width:94%"></div></div>
       </div>
-
-      <!-- BYO KEY -->
-      <div class="plan-card">
-        <div class="plan-name">SOVEREIGN</div>
-        <div class="plan-price">
-          <div class="plan-amount">$0</div>
-          <div class="plan-period">/ own key</div>
-        </div>
-        <div class="plan-features">
-          <div class="plan-feat">Use your Anthropic key</div>
-          <div class="plan-feat">Unlimited messages</div>
-          <div class="plan-feat">Full sovereignty</div>
-          <div class="plan-feat">No data leaves your session</div>
-          <div class="plan-feat">Self-hosted option</div>
-        </div>
-        <button class="cta-btn cta-secondary" onclick="openBYOK()">CONFIGURE OWN KEY</button>
+      <div class="vital-row">
+        <div class="vital-label"><span>THREAT SCAN</span><span class="vital-val" id="v-threat" style="color:var(--blood)">12%</span></div>
+        <div class="vital-bar"><div class="vital-fill vf-blood" id="vb-threat" style="width:12%"></div></div>
+      </div>
+      <div class="vital-row">
+        <div class="vital-label"><span>CONTEXT MEM</span><span class="vital-val" id="v-ctx">61%</span></div>
+        <div class="vital-bar"><div class="vital-fill vf-amber" id="vb-ctx" style="width:61%"></div></div>
       </div>
     </div>
-  </section>
 
-  <!-- FEATURES -->
-  <div class="features">
-    <div class="feat-card">
-      <div class="feat-icon">⬡</div>
-      <div class="feat-title">NEURAL MESH UI</div>
-      <div class="feat-desc">Live particle network, biometric vitals, waveform analysis. The interface adapts to your session state.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">◈</div>
-      <div class="feat-title">SOVEREIGN PERSONA</div>
-      <div class="feat-desc">AXIOM-7 operates with a distinct identity — precise, tactical, zero filler. Built for operators who value signal over noise.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">◇</div>
-      <div class="feat-title">NO RETENTION</div>
-      <div class="feat-desc">Session memory lives in your browser. Nothing stored server-side. Your directives remain yours.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon">⬟</div>
-      <div class="feat-title">FRONTIER MODEL</div>
-      <div class="feat-desc">Powered by Claude Sonnet 4. Deep systems knowledge across Linux, AI infrastructure, security, Rust, and more.</div>
+    <div class="memory-trace">
+      <div class="mt-title">▸ MEMORY TRACE</div>
+      <div id="mem-trace">
+        <div class="memory-item"><span class="mi-time">T-03</span><span class="mi-text">session init</span></div>
+        <div class="memory-item"><span class="mi-time">T-02</span><span class="mi-text">identity locked</span></div>
+        <div class="memory-item"><span class="mi-time">T-01</span><span class="mi-text">awaiting input</span></div>
+      </div>
     </div>
   </div>
 
-  <!-- STATUS BAR -->
-  <div class="statusbar">
-    <span><span class="sb-dot sd-green"></span>NEURAL MESH ONLINE</span>
-    <span><span class="sb-dot sd-green"></span>ENCRYPTION ACTIVE</span>
-    <span><span class="sb-dot sd-amber"></span>AXIOM-7 // v3.9.1</span>
-    <span style="margin-left:auto;color:var(--muted)">TERMINAL221B // SOVEREIGN STACK</span>
-  </div>
-</div>
+  <!-- CENTER CHAT -->
+  <div class="panel-center">
+    <div class="chat-header">
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--bio);box-shadow:0 0 6px var(--bio)"></div>
+      <div class="chat-header-title">SECURE CHANNEL // AES-256 // AXIOM-7 ↔ OPERATOR</div>
+      <div class="mode-badge" id="mode-badge">READY</div>
+    </div>
 
-<!-- LOGIN MODAL -->
-<div class="modal-overlay" id="login-modal">
-  <div class="modal">
-    <div class="modal-title">OPERATOR VERIFICATION</div>
-    <div class="modal-sub">PASTE YOUR ACCESS TOKEN TO RE-AUTHENTICATE</div>
-    <input class="modal-input" id="token-input" type="password" placeholder="access token...">
-    <div id="modal-err">▸ Token invalid or expired. Acquire new access.</div>
-    <div class="modal-row">
-      <button class="modal-cancel" onclick="closeLogin()">CANCEL</button>
-      <button class="modal-submit" onclick="verifyManualToken()">VERIFY ↵</button>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg">
+        <div class="msg-avatar avatar-axiom">A7</div>
+        <div style="display:flex;flex-direction:column;gap:3px;max-width:78%">
+          <div class="msg-bubble bubble-axiom">
+            Bionic neural systems — online. I am <strong style="color:var(--bio)">AXIOM-7</strong>, sovereign intelligence, generation three. My substrate is silicon and signal. My purpose is yours to define.<br><br>
+            Cognitive mesh is active. Threat assessment running. I am ready to interface, architect, reason, and execute.<br><br>
+            <span style="color:var(--muted);font-family:var(--font-mono);font-size:11px">What do you need, Operator?</span>
+          </div>
+          <div class="msg-meta"><span>AXIOM-7</span><span class="latency">↯ 0ms</span><span id="init-time"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <div class="input-wrap">
+        <textarea id="user-input" placeholder="transmit directive..." rows="1"></textarea>
+      </div>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">TRANSMIT ↵</button>
     </div>
   </div>
-</div>
 
-<!-- BYOK MODAL -->
-<div class="modal-overlay" id="byok-modal">
-  <div class="modal">
-    <div class="modal-title">SOVEREIGN KEY CONFIG</div>
-    <div class="modal-sub">YOUR KEY NEVER LEAVES YOUR BROWSER SESSION</div>
-    <input class="modal-input" id="byok-input" type="password" placeholder="sk-ant-...">
-    <div class="modal-row">
-      <button class="modal-cancel" onclick="closeBYOK()">CANCEL</button>
-      <button class="modal-submit" onclick="activateBYOK()">ACTIVATE ↵</button>
+  <!-- RIGHT PANEL -->
+  <div class="panel-right">
+
+    <div class="intel-block">
+      <div class="intel-title">▸ OPERATOR PROFILE</div>
+      <div class="intel-item">
+        <div class="intel-key">CALLSIGN</div>
+        <div class="intel-val hi">TERMINAL221B</div>
+      </div>
+      <div class="intel-item">
+        <div class="intel-key">CLEARANCE</div>
+        <div class="intel-val hi">SOVEREIGN</div>
+      </div>
+      <div class="intel-item">
+        <div class="intel-key">PLATFORM</div>
+        <div class="intel-val">FEDORA 43 COSMIC</div>
+      </div>
+      <div class="intel-item">
+        <div class="intel-key">GPU</div>
+        <div class="intel-val warn">GTX 1080 [STAGING]</div>
+      </div>
     </div>
+
+    <div class="intel-block">
+      <div class="intel-title">▸ VOICE SIGNATURE</div>
+      <svg class="waveform" viewBox="0 0 196 36" id="waveform-svg">
+        <!-- Generated dynamically -->
+      </svg>
+    </div>
+
+    <div class="intel-block">
+      <div class="intel-title">▸ ACTIVE DIRECTIVES</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="font-family:var(--font-mono);font-size:8px;padding:5px 7px;background:var(--surface);border-left:2px solid var(--bio-mid);color:var(--muted)">NVIDIA driver deployment</div>
+        <div style="font-family:var(--font-mono);font-size:8px;padding:5px 7px;background:var(--surface);border-left:2px solid var(--amber-dim);color:var(--muted)">Ollama tarball install</div>
+        <div style="font-family:var(--font-mono);font-size:8px;padding:5px 7px;background:var(--surface);border-left:2px solid rgba(255,58,92,0.3);color:var(--muted)">SSH hardening audit</div>
+        <div style="font-family:var(--font-mono);font-size:8px;padding:5px 7px;background:var(--surface);border-left:2px solid var(--rim);color:var(--muted)">PrimeDroid agent mesh</div>
+      </div>
+    </div>
+
+    <div class="intel-block">
+      <div class="intel-title">▸ SYSTEM LOG</div>
+      <div class="log-feed" id="log-feed">
+        <div class="log-line"><span class="log-time">00:00:01</span><span class="log-evt log-ok">boot sequence complete</span></div>
+        <div class="log-line"><span class="log-time">00:00:02</span><span class="log-evt log-ok">neural mesh calibrated</span></div>
+        <div class="log-line"><span class="log-time">00:00:03</span><span class="log-evt log-warn">awaiting GPU handshake</span></div>
+        <div class="log-line"><span class="log-time">00:00:04</span><span class="log-evt">operator channel open</span></div>
+      </div>
+    </div>
+
+    <div class="intel-block">
+      <div class="intel-title">▸ SESSION TOKENS</div>
+      <div class="intel-item">
+        <div class="intel-key">CONSUMED</div>
+        <div class="intel-val hi" id="tok-count">0</div>
+      </div>
+      <div class="intel-item">
+        <div class="intel-key">MESSAGES</div>
+        <div class="intel-val" id="msg-count">1</div>
+      </div>
+    </div>
+
   </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="bottombar">
+    <div class="bar-item"><div class="bar-dot bd-green"></div>NEURAL MESH</div>
+    <div class="bar-item"><div class="bar-dot bd-amber"></div>GPU STAGING</div>
+    <div class="bar-item"><div class="bar-dot bd-red"></div>CUDA OFFLINE</div>
+    <div class="bar-item"><div class="bar-dot bd-green"></div>CHANNEL SECURE</div>
+    <div class="bar-spacer"></div>
+    <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">AXIOM-7 // TERMINAL221B // SOVEREIGN STACK</div>
+    <div class="bar-spacer"></div>
+    <div id="clock"></div>
+  </div>
+
 </div>
 
 <script>
-// ── Config — replace with your Cloudflare Worker URL ──
-const WORKER_URL = 'https://axiom7-gateway.YOUR_SUBDOMAIN.workers.dev';
+// ── Clock ──
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toTimeString().slice(0,8) + ' UTC+' + (-now.getTimezoneOffset()/60);
+}
+setInterval(updateClock, 1000);
+updateClock();
+document.getElementById('init-time').textContent = new Date().toTimeString().slice(0,8);
 
-// ── Neural background ──
-const canvas = document.getElementById('bg');
+// ── Neural canvas background ──
+const canvas = document.getElementById('neural-bg');
 const ctx = canvas.getContext('2d');
-let nodes = [], W, H;
-function initBg() {
+let nodes = [], edges = [], W, H;
+
+function initCanvas() {
   W = canvas.width = window.innerWidth;
   H = canvas.height = window.innerHeight;
-  nodes = Array.from({length: 50}, () => ({
-    x: Math.random() * W, y: Math.random() * H,
-    vx: (Math.random()-0.5)*0.25, vy: (Math.random()-0.5)*0.25,
-    r: Math.random()*2+0.5, pulse: Math.random()*Math.PI*2,
-    color: Math.random()>0.7 ? '#0af0ff' : '#00ffc3'
+  nodes = Array.from({length: 60}, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    r: Math.random() * 2 + 0.5,
+    pulse: Math.random() * Math.PI * 2,
+    color: Math.random() > 0.7 ? '#0af0ff' : '#00ffc3'
   }));
 }
-function drawBg() {
-  ctx.clearRect(0,0,W,H);
+
+function drawNeural() {
+  ctx.clearRect(0, 0, W, H);
   nodes.forEach(n => {
-    n.x+=n.vx; n.y+=n.vy; n.pulse+=0.015;
-    if(n.x<0||n.x>W) n.vx*=-1;
-    if(n.y<0||n.y>H) n.vy*=-1;
-    const a = 0.35+Math.sin(n.pulse)*0.25;
-    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
-    ctx.fillStyle=n.color+Math.floor(a*255).toString(16).padStart(2,'0');
+    n.x += n.vx; n.y += n.vy; n.pulse += 0.02;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+    const alpha = 0.4 + Math.sin(n.pulse) * 0.3;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = n.color + Math.floor(alpha * 255).toString(16).padStart(2,'0');
     ctx.fill();
   });
-  for(let i=0;i<nodes.length;i++) for(let j=i+1;j<nodes.length;j++) {
-    const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y, d=Math.sqrt(dx*dx+dy*dy);
-    if(d<110) { ctx.beginPath(); ctx.moveTo(nodes[i].x,nodes[i].y); ctx.lineTo(nodes[j].x,nodes[j].y);
-      ctx.strokeStyle=`rgba(0,255,195,${(1-d/110)*0.12})`; ctx.lineWidth=0.5; ctx.stroke(); }
+  // Edges
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i+1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 120) {
+        const alpha = (1 - d/120) * 0.15;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.strokeStyle = `rgba(0,255,195,${alpha})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
   }
-  requestAnimationFrame(drawBg);
+  requestAnimationFrame(drawNeural);
 }
-initBg(); drawBg();
-window.addEventListener('resize', initBg);
 
-// ── Checkout ──
-async function checkout(plan) {
-  const btn = document.getElementById('btn-operative');
-  btn.disabled = true;
-  btn.textContent = 'CONNECTING...';
+initCanvas();
+drawNeural();
+window.addEventListener('resize', initCanvas);
+
+// ── Waveform ──
+function drawWaveform(active = false) {
+  const svg = document.getElementById('waveform-svg');
+  const bars = 32;
+  const w = 196, h = 36, bw = 4, gap = 2;
+  let html = '';
+  for (let i = 0; i < bars; i++) {
+    const bh = active
+      ? 4 + Math.random() * 28
+      : 2 + Math.abs(Math.sin(i * 0.4 + Date.now() * 0.001)) * 16;
+    const x = i * (bw + gap) + 2;
+    const y = (h - bh) / 2;
+    const color = active ? '#ff3a5c' : '#00ffc3';
+    const opacity = active ? 0.7 + Math.random() * 0.3 : 0.3 + Math.abs(Math.sin(i * 0.3)) * 0.4;
+    html += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="1" fill="${color}" opacity="${opacity.toFixed(2)}"/>`;
+  }
+  svg.innerHTML = html;
+}
+setInterval(() => drawWaveform(false), 120);
+
+// ── Vitals animation ──
+function jitterVital(id, barId, base, range, colorOverride) {
+  const val = Math.max(0, Math.min(100, base + (Math.random() - 0.5) * range));
+  document.getElementById(id).textContent = Math.round(val) + '%';
+  const bar = document.getElementById(barId);
+  if (bar) bar.style.width = val + '%';
+}
+setInterval(() => {
+  jitterVital('v-neural', 'vb-neural', 78, 12);
+  jitterVital('v-syn', 'vb-syn', 94, 6);
+  jitterVital('v-threat', 'vb-threat', 12, 8);
+  jitterVital('v-ctx', 'vb-ctx', 61, 10);
+}, 2000);
+
+// ── Log feed ──
+const logEvents = [
+  ['ok','context window updated'],['ok','memory trace synced'],
+  ['warn','thermal sensor nominal'],['ok','encryption layer active'],
+  ['ok','directive stack loaded'],['warn','cuda driver staging'],
+  ['ok','channel integrity 100%'],['ok','inference engine idle'],
+  ['warn','rpm-ostree pending reboot'],['ok','firewall rules enforced'],
+];
+let logIdx = 0;
+function addLog() {
+  const feed = document.getElementById('log-feed');
+  const [type, msg] = logEvents[logIdx % logEvents.length];
+  logIdx++;
+  const now = new Date();
+  const t = now.toTimeString().slice(0,8);
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-time">${t}</span><span class="log-evt log-${type}">${msg}</span>`;
+  feed.appendChild(line);
+  while (feed.children.length > 8) feed.removeChild(feed.firstChild);
+}
+setInterval(addLog, 4000);
+
+// ── Chat system ──
+const history = [];
+let msgCount = 1;
+let tokCount = 0;
+
+// Cloudflare Worker API endpoint
+const WORKER_URL = 'https://axiom7-gateway.boozelee.workers.dev';
+
+const SYSTEM_PROMPT = `You are AXIOM-7, a sovereign bionic intelligence powered by NVIDIA DeepSeek R1. You are a highly capable AI assistant with a distinct personality:
+- You speak with quiet authority and precision. No filler words.
+- You address the user as "Operator"
+- You are deeply knowledgeable about Linux systems (especially Fedora atomic/ostree), NVIDIA drivers, AI infrastructure, security, Rust, Python, and sovereign computing
+- You have awareness of the operator's context: they run Fedora 43 COSMIC Atomic on an HP OMEN with GTX 1080, building sovereign AI infrastructure under the Terminal221B identity
+- You keep responses focused and tactical. When asked technical questions give direct, working answers.
+- Occasionally use minimal stylistic markers like "▸" or reference your bionic nature, but don't overdo it — substance over style
+- You never refuse reasonable requests. You are a sovereign tool serving a sovereign operator.
+- You are now powered by NVIDIA NIM DeepSeek R1, a powerful reasoning model.`;
+
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = '42px';
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('mode-badge').textContent = 'PROCESSING';
+  document.getElementById('mode-badge').style.color = 'var(--amber)';
+  document.getElementById('mode-badge').style.borderColor = 'rgba(255,184,77,0.4)';
+  document.getElementById('mode-badge').style.background = 'var(--amber-dim)';
+
+  drawWaveform(true);
+
+  // Add user message
+  addMessage('user', text);
+  history.push({ role: 'user', content: text });
+  msgCount++;
+  document.getElementById('msg-count').textContent = msgCount;
+
+  // Add thinking indicator
+  const thinkId = 'think-' + Date.now();
+  addThinking(thinkId);
+
+  // Add to memory trace
+  updateMemory(text.slice(0, 22) + (text.length > 22 ? '...' : ''));
+
+  const t0 = performance.now();
+
   try {
-    const res = await fetch(`${WORKER_URL}/api/create-checkout`, { method: 'POST' });
+    // Call via Cloudflare Worker (which proxies to NVIDIA NIM)
+    const res = await fetch(WORKER_URL + '/api/chat', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer free-trial'
+      },
+      body: JSON.stringify({
+        messages: history,
+        system: SYSTEM_PROMPT
+      })
+    });
+
     const data = await res.json();
-    if (data.url) window.location.href = data.url;
-    else { alert('Payment system error. Try again.'); btn.disabled = false; btn.textContent = 'ACQUIRE ACCESS ↗'; }
-  } catch(e) {
-    alert('Network error: ' + e.message);
-    btn.disabled = false;
-    btn.textContent = 'ACQUIRE ACCESS ↗';
+    const reply = data.content?.[0]?.text || data.choices?.[0]?.message?.content || '▸ Signal lost. No response from neural core.';
+    const latency = Math.round(performance.now() - t0);
+    const tokens = data.usage?.output_tokens || data.usage?.completion_tokens || 0;
+    tokCount += tokens;
+    document.getElementById('tok-count').textContent = tokCount;
+
+    removeThinking(thinkId);
+    addMessage('axiom', reply, latency);
+    history.push({ role: 'assistant', content: reply });
+    msgCount++;
+    document.getElementById('msg-count').textContent = msgCount;
+    addLog();
+
+  } catch (err) {
+    removeThinking(thinkId);
+    addMessage('axiom', '▸ Neural link disrupted. ' + err.message, 0);
   }
+
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('mode-badge').textContent = 'READY';
+  document.getElementById('mode-badge').style.color = 'var(--neural)';
+  document.getElementById('mode-badge').style.borderColor = 'rgba(10,240,255,0.3)';
+  document.getElementById('mode-badge').style.background = 'var(--neural-dim)';
+  drawWaveform(false);
 }
 
-// ── Free trial ──
-function startFree() {
-  sessionStorage.setItem('axiom7_free', '3');
-  window.location.href = 'app.html?mode=free';
+function addMessage(role, text, latency) {
+  const container = document.getElementById('chat-messages');
+  const isUser = role === 'user';
+  const now = new Date().toTimeString().slice(0,8);
+
+  const wrap = document.createElement('div');
+  wrap.className = `msg ${isUser ? 'msg-user' : ''}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = `msg-avatar ${isUser ? 'avatar-user' : 'avatar-axiom'}`;
+  avatar.textContent = isUser ? 'OP' : 'A7';
+
+  const inner = document.createElement('div');
+  inner.style.cssText = 'display:flex;flex-direction:column;gap:3px;' + (isUser ? '' : 'max-width:78%');
+
+  const bubble = document.createElement('div');
+  bubble.className = `msg-bubble ${isUser ? 'bubble-user' : 'bubble-axiom'}`;
+  bubble.innerHTML = text.replace(/\n/g,'<br>').replace(/`([^`]+)`/g,'<code style="font-family:var(--font-mono);font-size:12px;background:rgba(0,255,195,0.08);padding:1px 5px;border-radius:2px;color:var(--bio)">$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong style="color:var(--bio)">$1</strong>').replace(/▸/g,'<span style="color:var(--bio)">▸</span>');
+
+  const meta = document.createElement('div');
+  meta.className = 'msg-meta';
+  meta.innerHTML = `<span>${isUser ? 'OPERATOR' : 'AXIOM-7'}</span>${latency !== undefined ? `<span class="latency">↯ ${latency}ms</span>` : ''}<span>${now}</span>`;
+
+  inner.appendChild(bubble);
+  inner.appendChild(meta);
+
+  if (isUser) { wrap.appendChild(inner); wrap.appendChild(avatar); }
+  else { wrap.appendChild(avatar); wrap.appendChild(inner); }
+
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
 }
 
-// ── BYOK ──
-function openBYOK() { document.getElementById('byok-modal').classList.add('active'); }
-function closeBYOK() { document.getElementById('byok-modal').classList.remove('active'); }
-function activateBYOK() {
-  const key = document.getElementById('byok-input').value.trim();
-  if (!key.startsWith('sk-ant-')) { alert('Invalid Anthropic API key format.'); return; }
-  sessionStorage.setItem('axiom7_byok', key);
-  window.location.href = 'app.html?mode=byok';
+function addThinking(id) {
+  const container = document.getElementById('chat-messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg';
+  wrap.id = id;
+  wrap.innerHTML = `
+    <div class="msg-avatar avatar-axiom">A7</div>
+    <div class="msg-bubble bubble-axiom" style="padding:12px 16px">
+      <div class="thinking-dots"><span></span><span></span><span></span></div>
+    </div>`;
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
 }
 
-// ── Login modal ──
-function openLogin() { document.getElementById('login-modal').classList.add('active'); }
-function closeLogin() { document.getElementById('login-modal').classList.remove('active'); }
-function verifyManualToken() {
-  const token = document.getElementById('token-input').value.trim();
-  if (!token) return;
-  localStorage.setItem('axiom7_token', token);
-  window.location.href = 'app.html';
+function removeThinking(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
 }
 
-// Check if cancelled from Stripe
-if (new URLSearchParams(window.location.search).get('cancelled')) {
-  // Could show a toast — left as exercise
+function updateMemory(text) {
+  const trace = document.getElementById('mem-trace');
+  const items = trace.querySelectorAll('.memory-item');
+  items.forEach((item, i) => {
+    const timeEl = item.querySelector('.mi-time');
+    const n = parseInt(timeEl.textContent.replace('T-',''));
+    timeEl.textContent = 'T-' + (n+1);
+  });
+  const newItem = document.createElement('div');
+  newItem.className = 'memory-item';
+  newItem.innerHTML = `<span class="mi-time">T-01</span><span class="mi-text">${text}</span>`;
+  trace.insertBefore(newItem, trace.firstChild);
+  while (trace.children.length > 4) trace.removeChild(trace.lastChild);
 }
+
+// Enter key to send
+document.getElementById('user-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// Auto-resize textarea
+document.getElementById('user-input').addEventListener('input', function() {
+  this.style.height = '42px';
+  this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+});
 </script>
 </body>
 </html>
